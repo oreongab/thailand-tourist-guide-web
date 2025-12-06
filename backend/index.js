@@ -64,7 +64,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// 3. API ดึงข้อมูล User สำหรับหน้า Edit (รวมรหัสผ่าน) - ต้องอยู่ก่อน /users/:id
+// 3. API ดึงข้อมูล User สำหรับหน้า Edit 
 app.get('/users/:id/edit', async (req, res) => {
     const user_id = req.params.id;
     console.log('Edit API called for user_id:', user_id);
