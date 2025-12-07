@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <title>Aow Ngai Dee Wa – Place Detail</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Material Icons -->
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+
+  <!-- main css อยู่ข้างนอก -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- JS ของหน้านี้ -->
+  <script defer src="place.js"></script>
+</head>
+
+<body class="place-detail-body">
+  <main class="place-detail-page">
+    <!-- ปุ่มย้อนกลับ (อันนี้โชว์ตลอด) -->
+    <button class="place-detail-back" aria-label="ย้อนกลับ">
+      <span class="material-icons">arrow_back_ios_new</span>
+    </button>
+
+    <!-- เนื้อหาที่ต้องการ “ซ่อนทั้งหมด” รอหลังบ้านมาใส่ข้อมูล -->
+    <div class="place-detail-content">
+      <!-- HERO: รูป + หัวใจ -->
+      <section class="place-detail-hero">
+        <!-- หลังบ้านมาใส่ src / alt ให้ -->
+        <img
+          id="detail-image"
+          src=""
+          alt=""
+          class="place-detail-image"
+        />
+
+        <button class="place-detail-fav" type="button" aria-label="Favorite">
+          <span class="material-icons">favorite_border</span>
+        </button>
+      </section>
+
+      <!-- ข้อมูลหลัก -->
+      <section class="place-detail-main">
+        <!-- เวลาเปิด -->
+        <div class="place-detail-row">
+          <div class="place-detail-icon">
+            <span class="material-icons">schedule</span>
+          </div>
+          <div class="place-detail-text" id="detail-opening">
+            <!-- เวลาเปิดทำการจากหลังบ้าน -->
+          </div>
+        </div>
+
+        <!-- ที่ตั้ง -->
+        <div class="place-detail-row">
+          <div class="place-detail-icon">
+            <span class="material-icons">place</span>
+          </div>
+          <div class="place-detail-text" id="detail-location">
+            <!-- ที่ตั้งจากหลังบ้าน -->
+          </div>
+        </div>
+
+        <!-- คะแนนรีวิว -->
+        <div class="place-detail-row">
+          <div class="place-detail-icon">
+            <span class="material-icons">star_rate</span>
+          </div>
+          <div class="place-detail-text">
+            <span id="detail-rating-label"></span>
+            <span class="place-detail-stars" id="detail-stars"></span>
+            <span class="place-detail-rating" id="detail-rating-score"></span>
+          </div>
+        </div>
+
+        <!-- ค่าเข้าชม -->
+        <div class="place-detail-row">
+          <div class="place-detail-icon">
+            <span class="material-icons">attach_money</span>
+          </div>
+          <div class="place-detail-text" id="detail-price">
+            <!-- ค่าเข้าชมจากหลังบ้าน -->
+          </div>
+        </div>
+
+        <!-- หมวด -->
+        <div class="place-detail-row">
+          <div class="place-detail-icon">
+            <span class="material-icons">category</span>
+          </div>
+          <div class="place-detail-text" id="detail-category">
+            <!-- หมวดจากหลังบ้าน -->
+          </div>
+        </div>
+      </section>
+
+      <!-- เส้นคั่น -->
+      <hr class="place-detail-divider" />
+
+      <!-- รายละเอียด -->
+      <section class="place-detail-description">
+        <h2>รายละเอียด</h2>
+        <p id="detail-description">
+          <!-- รายละเอียดสถานที่จากหลังบ้าน -->
+        </p>
+      </section>
+    </div><!-- /place-detail-content -->
+  </main>
+</body>
+</html>
