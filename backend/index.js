@@ -197,9 +197,33 @@ app.get('/places', async (req, res) => {
     }
 });
 
-//8. cafe
-app.get('/places/cafes', async (req, res) => {
+// กรอง category
+const categoryMapping = {
+    'cafes':      'Cafe & Restaurants',
+    'temples':    'Temple',
+    'natural':    'Natural',
+    'sport':      'Sports',
+    'art':        'Art',
+    'museums':    'Museums',
+    'markets':    'Markets',
+    'beaches':    'Beaches',
+    'parks':      'Parks & Garden',
+    'historical': 'History',
+    'malls':      'Mall',
+    'other':      'Other'
+};
+
+app.get('/places/category/:type', async (req, res) => {
     try {
+        const { type } = req.params; 
+        const dbCategoryName = categoryMapping[type]; 
+
+   
+        if (!dbCategoryName) {
+            console.warn(`Invalid category requested: ${type}`);
+            return res.status(404).json({ error: 'Category not found or invalid' });
+        }
+
         const sql = `
             SELECT DISTINCT p.place_id,
                 p.place_name,
@@ -210,269 +234,18 @@ app.get('/places/cafes', async (req, res) => {
             LEFT JOIN place_images USING (place_id)
             JOIN place_category USING (place_id)
             JOIN category USING (category_id) 
-            WHERE category_name = 'Cafe & Restaurants'
+            WHERE category_name = ?
         `;
-        const [rows] = await db.execute(sql);
+
+        const [rows] = await db.execute(sql, [dbCategoryName]);
+        
         res.json(rows);
+
     } catch (error) {
-        console.error('Error fetching cafes:', error);
+        console.error(`Error fetching category ${req.params.type}:`, error);
         res.status(500).json({ error: error.message });
     }
 });
-
-//9. temple
-app.get('/places/temples', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Temple'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching temples:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//10. natural
-app.get('/places/natural', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Natural'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching natural:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//11. sport
-app.get('/places/sport', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Sports'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching sport:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//12. art
-app.get('/places/art', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Art'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching art:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//13. museums
-app.get('/places/museums', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Museums'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching museums:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//14. markets
-app.get('/places/markets', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Markets'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching markets:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//15. beaches
-app.get('/places/beaches', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Beaches'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching beaches:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//16. parks
-app.get('/places/parks', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Parks & Garden'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching parks:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//17. historical
-app.get('/places/historical', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'History'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching historical:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//18. malls
-app.get('/places/malls', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Mall'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching malls:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-//19. other
-app.get('/places/other', async (req, res) => {
-    try {
-        const sql = `
-            SELECT DISTINCT p.place_id,
-                p.place_name,
-                p.opening_hours,
-                p.place_score,
-                image_path 
-            FROM place p
-            LEFT JOIN place_images USING (place_id)
-            JOIN place_category USING (place_id)
-            JOIN category USING (category_id) 
-            WHERE category_name = 'Other'
-        `;
-        const [rows] = await db.execute(sql);
-        res.json(rows);
-    } catch (error) {
-        console.error('Error fetching other:', error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
 
 
 

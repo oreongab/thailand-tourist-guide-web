@@ -39,7 +39,7 @@ function setupChipActive() {
 async function fetchPlacesByCategory(category) {
   try {
     console.log('Fetching category:', category);
-    const url = `http://localhost:3000/places/${category}`;
+    const url = `http://localhost:3000/places/category/${category}`;
     console.log('URL:', url);
     
     const response = await fetch(url);

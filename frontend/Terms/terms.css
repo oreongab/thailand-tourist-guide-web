@@ -1,0 +1,156 @@
+:root {
+  /* ให้เหมือนหน้า about */
+  --bg-gradient: linear-gradient(135deg, #00636e, #009688);
+  --terms-text-main: #ffffff;
+  --terms-text-muted: rgba(255, 255, 255, 0.86);
+  --terms-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --arrow-color: #ffffff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.terms-body {
+  font-family: var(--terms-font);
+  background: var(--bg-gradient);
+  color: var(--terms-text-main);
+}
+
+/* ====== DESKTOP LAYOUT ====== */
+
+.terms-page {
+  min-height: 100vh;
+  padding: 32px 80px 40px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ปุ่ม back มุมซ้ายบน แบบหัวลูกศร */
+.terms-back-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+
+  position: absolute;
+  top: 24px;
+  left: 24px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.terms-back-btn:hover {
+  background: rgba(0, 0, 0, 0.16);
+}
+
+/* วาดหัวลูกศร */
+.arrow-icon {
+  width: 14px;
+  height: 14px;
+  border-top: 2.5px solid var(--arrow-color);
+  border-left: 2.5px solid var(--arrow-color);
+  transform: rotate(-45deg);  /* ชี้ไปทางซ้าย */
+}
+
+/* หัวเรื่องกลางจอ */
+.terms-header {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.terms-header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+/* เนื้อหากลางหน้าจอ */
+.terms-main {
+  flex: 1;
+  display: flex;
+  justify-content: center;   /* กึ่งกลางแนวนอน */
+  align-items: flex-start;   /* ด้านบนหน่อย ไม่ให้กลางเป๊ะจนดูโล่งเกิน */
+  margin-top: 32px;
+}
+
+.terms-content {
+  max-width: 720px;
+  text-align: left;
+}
+
+.terms-content h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.terms-content p {
+  margin: 0 0 20px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--terms-text-main);
+}
+
+/* เส้นคั่นสั้น ๆ ตามรูป */
+.terms-separator {
+  width: 40px;
+  height: 2px;
+  background: var(--terms-text-muted);
+  margin: 10px 0 24px;
+}
+
+/* ====== MOBILE / TABLET ====== */
+
+@media (max-width: 768px) {
+  .terms-page {
+    padding: 20px 20px 24px;
+  }
+
+  .terms-back-btn {
+    top: 16px;
+    left: 16px;
+  }
+
+  .terms-header {
+    margin-top: 32px;
+  }
+
+  .terms-header h1 {
+    font-size: 22px;
+  }
+
+  .terms-main {
+    margin-top: 24px;
+    justify-content: flex-start;
+  }
+
+  .terms-content {
+    max-width: 100%;
+  }
+
+  .terms-content h2 {
+    font-size: 16px;
+  }
+
+  .terms-content p {
+    font-size: 14px;
+  }
+
+  .terms-separator {
+    margin: 10px 0 20px;
+  }
+}
