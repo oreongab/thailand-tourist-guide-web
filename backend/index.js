@@ -64,7 +64,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// 3. API ดึงข้อมูล User สำหรับหน้า Edit (รวมรหัสผ่าน) - ต้องอยู่ก่อน /users/:id
+// 3. API ดึงข้อมูล User สำหรับหน้า Edit
 app.get('/users/:id/edit', async (req, res) => {
     const user_id = req.params.id;
     console.log('Edit API called for user_id:', user_id);
@@ -131,6 +131,7 @@ app.delete('/users/:id', async (req, res) => {
     }
 });
 
+// 6. API แก้ไขข้อมูลผู้ใช้ (Edit User)
 app.post('/edituser', async (req, res) => {
     const { user_id, user_name, first_name, last_name, user_email, user_password } = req.body;
     
@@ -174,7 +175,311 @@ app.post('/edituser', async (req, res) => {
     }
 });
 
-// เริ่มต้น Server
+//7.API ดึงสถานที่
+app.get('/places', async (req, res) => {
+    try {
+        const sql = `
+            SELECT 
+                p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                pi.image_path
+            FROM place p
+            LEFT JOIN place_images pi ON p.place_id = pi.place_id
+            ORDER BY p.place_id
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching places:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//8. cafe
+app.get('/places/cafes', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Cafe & Restaurants'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching cafes:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//9. temple
+app.get('/places/temples', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Temple'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching temples:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//10. natural
+app.get('/places/natural', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Natural'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching natural:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//11. sport
+app.get('/places/sport', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Sports'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching sport:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//12. art
+app.get('/places/art', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Art'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching art:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//13. museums
+app.get('/places/museums', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Museums'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching museums:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//14. markets
+app.get('/places/markets', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Markets'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching markets:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//15. beaches
+app.get('/places/beaches', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Beaches'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching beaches:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//16. parks
+app.get('/places/parks', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Parks & Garden'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching parks:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//17. historical
+app.get('/places/historical', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'History'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching historical:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//18. malls
+app.get('/places/malls', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Mall'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching malls:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+//19. other
+app.get('/places/other', async (req, res) => {
+    try {
+        const sql = `
+            SELECT DISTINCT p.place_id,
+                p.place_name,
+                p.opening_hours,
+                p.place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)
+            JOIN place_category USING (place_id)
+            JOIN category USING (category_id) 
+            WHERE category_name = 'Other'
+        `;
+        const [rows] = await db.execute(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching other:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+
+
+
+
+
+
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });

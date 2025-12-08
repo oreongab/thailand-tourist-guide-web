@@ -5,7 +5,7 @@
 }
 
 .popup-overlay {
-    display: none;
+    display: block;
     position: fixed;
     top: 0;
     left: 0;
@@ -20,7 +20,7 @@
 }
 
 .popup-container {
-    display: none;
+    display: block;
     position: fixed;
     top: 50%;
     left: 50%;
