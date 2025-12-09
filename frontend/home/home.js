@@ -536,6 +536,152 @@ async function fetchPlaces() {
 // Export ให้ chip-filter.js ใช้
 window.fetchPlaces = fetchPlaces;
 
+// ========== SEARCH ในหน้า Home ==========
+function setupHomeSearch() {
+  const searchInput = document.getElementById('searchInput');
+  const suggestionsDiv = document.getElementById('searchSuggestions');
+  
+  if (!searchInput) return;
+  
+  let searchTimeout;
+  let allPlaces = []; // เก็บข้อมูลสถานที่ทั้งหมดสำหรับ suggestions
+  
+  // โหลดข้อมูลสถานที่ทั้งหมดสำหรับ suggestions
+  async function loadAllPlaces() {
+    try {
+      const response = await fetch('http://localhost:3000/places');
+      if (response.ok) {
+        allPlaces = await response.json();
+      }
+    } catch (error) {
+      console.error('Error loading places for suggestions:', error);
+    }
+  }
+  
+  loadAllPlaces();
+  
+  // แสดง suggestions
+  function showSuggestions(query) {
+    if (!suggestionsDiv || !query || query.length < 1) {
+      if (suggestionsDiv) suggestionsDiv.style.display = 'none';
+      return;
+    }
+    
+    const lowerQuery = query.toLowerCase();
+    const filtered = allPlaces.filter(place => 
+      place.place_name.toLowerCase().includes(lowerQuery) ||
+      place.place_province.toLowerCase().includes(lowerQuery)
+    ).slice(0, 8); // แสดงแค่ 8 รายการ
+    
+    if (filtered.length === 0) {
+      suggestionsDiv.style.display = 'none';
+      return;
+    }
+    
+    suggestionsDiv.innerHTML = filtered.map(place => `
+      <div class="search-suggestion-item" data-id="${place.place_id}">
+        <div class="suggestion-name">${place.place_name}</div>
+        <div class="suggestion-province">
+          ${place.place_province}
+          <span class="suggestion-score">★ ${parseFloat(place.place_score || 0).toFixed(1)}</span>
+        </div>
+      </div>
+    `).join('');
+    
+    suggestionsDiv.style.display = 'block';
+    
+    // คลิก suggestion
+    suggestionsDiv.querySelectorAll('.search-suggestion-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const placeId = item.dataset.id;
+        window.location.href = `../place/place-detail.html?id=${placeId}`;
+      });
+    });
+  }
+  
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    
+    const query = e.target.value.trim();
+    
+    console.log('Search input:', query);
+    
+    // แสดง suggestions
+    showSuggestions(query);
+    
+    // ถ้าไม่มีคำค้นหา ให้โหลดข้อมูลปกติ
+    if (query === '') {
+      fetchPlaces();
+      return;
+    }
+    
+    // รอ 500ms หลังจากพิมพ์เสร็จ
+    searchTimeout = setTimeout(() => {
+      searchPlaces(query);
+    }, 500);
+  });
+  
+  // ปิด suggestions เมื่อคลิกข้างนอก
+  document.addEventListener('click', (e) => {
+    if (suggestionsDiv && !searchInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+      suggestionsDiv.style.display = 'none';
+    }
+  });
+}
+
+// ========== ค้นหาสถานที่ในหน้า Home ==========
+async function searchPlaces(query) {
+  try {
+    console.log('Searching in home page for:', query);
+    
+    const params = new URLSearchParams({
+      query: query
+    });
+    
+    const url = `http://localhost:3000/places/search?${params.toString()}`;
+    console.log('Search URL:', url);
+    
+    const response = await fetch(url);
+    const result = await response.json();
+    
+    console.log('Search results:', result);
+    
+    if (result.success && result.data) {
+      const places = result.data.map((item, index) => {
+        let imagePath = 'https://static.vecteezy.com/system/resources/previews/004/141/669/non_2x/no-photo-or-blank-image-icon-loading-images-or-missing-image-mark-image-not-available-or-image-coming-soon-sign-simple-nature-silhouette-in-frame-isolated-illustration-vector.jpg';
+        if (item.image_path) {
+          const fileName = item.image_path.includes('/') || item.image_path.includes('\\') 
+            ? item.image_path.split(/[/\\]/).pop() 
+            : item.image_path;
+          imagePath = `../../img_place/${fileName}`;
+        }
+        
+        return {
+          id: item.place_id,
+          rank: index + 1,
+          title: item.place_name,
+          imageUrl: imagePath,
+          openDays: item.place_province || '',
+          openHours: item.opening_hours || '',
+          rating: item.place_score || 0
+        };
+      });
+      
+      renderPlaceCards(places);
+    } else {
+      renderPlaceCards([]);
+    }
+    
+  } catch (error) {
+    console.error('Search error:', error);
+    const grid = document.getElementById("placeGrid");
+    if (grid) {
+      grid.innerHTML = '<p style="text-align:center; padding:2rem; color:#666;">ไม่สามารถค้นหาได้ กรุณาลองใหม่อีกครั้ง</p>';
+      grid.style.display = 'block';
+    }
+  }
+}
+
 // ========== INIT ==========
 document.addEventListener("DOMContentLoaded", () => {
   setupMobileMenu();
@@ -546,5 +692,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCategoryPanel(); // Category filter panel (nav link)
   setupFavoriteToggle();
   setupAuthButtons();
-  fetchPlaces();            // ดึงข้อมูลสถานที่
+  setupHomeSearch();     // เพิ่มฟังก์ชัน search
+  fetchPlaces();         // ดึงข้อมูลสถานที่
 });

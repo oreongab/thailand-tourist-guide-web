@@ -85,7 +85,9 @@
         <div class="hero-search-row">
           <div class="search-box hero-search-box">
             <span class="material-icons">search</span>
-            <input type="text" id="searchInput" placeholder="Search for places" />
+            <input type="text" id="searchInput" placeholder="Search for places" autocomplete="off" />
+            <!-- Dropdown suggestions -->
+            <div class="search-suggestions" id="searchSuggestions" style="display:none;"></div>
           </div>
           <div class="filter-btn-wrapper">
             <button class="filter-icon-btn hero-filter-btn"

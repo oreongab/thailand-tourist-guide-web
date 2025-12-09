@@ -7,11 +7,10 @@ const app = express();
 const port = 3000;
 const SALT_ROUNDS = 10;
 
+app.use(cors());
+app.use(express.json());
 
-app.use(cors()); // อนุญาตให้เชื่อมต่อข้ามโดเมนได้
-app.use(express.json()); // อ่านข้อมูล JSON ที่ส่งมาจาก Frontend
-
-// 1. API สมัครสมาชิก (Register)
+// 1.Register
 app.post('/register', async (req, res) => {
     const { user_name, first_name, last_name, user_email, user_password } = req.body;
     try {
@@ -30,7 +29,7 @@ app.post('/register', async (req, res) => {
     }
 });
 
-// 2. API ล็อกอิน (Login)
+// 2.Login
 app.post('/login', async (req, res) => {
     const { user_email, user_password } = req.body;
     try {
@@ -41,7 +40,6 @@ app.post('/login', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // แก้ไข: rows[0] คือ object ไม่ต้องใส่ [] ครอบ
         const user = rows[0]; 
 
         const isMatch = await bcrypt.compare(user_password, user.user_password);
@@ -64,7 +62,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// 3. API ดึงข้อมูล User สำหรับหน้า Edit
+// 3. ดึงข้อมูล User หน้า Edit
 app.get('/users/:id/edit', async (req, res) => {
     const user_id = req.params.id;
     console.log('Edit API called for user_id:', user_id);
@@ -102,7 +100,7 @@ app.get('/users/:id', async (req, res) => {
     }
 });
 
-// 4. API ดึงข้อมูลทั้งหมด (Get All Users)
+// 4.Get All Users
 app.get('/users', async (req, res) => {
     try {
         const [rows] = await db.execute('SELECT user_id, user_name, user_email FROM user');
@@ -112,7 +110,7 @@ app.get('/users', async (req, res) => {
     }
 });
 
-// 5. API ลบผู้ใช้ตาม ID (Delete User by ID)
+// 5. ลบผู้ใช้ตาม ID 
 app.delete('/users/:id', async (req, res) => {
     const id = req.params.id; 
     
@@ -131,7 +129,7 @@ app.delete('/users/:id', async (req, res) => {
     }
 });
 
-// 6. API แก้ไขข้อมูลผู้ใช้ (Edit User)
+// 6.Edit User
 app.post('/edituser', async (req, res) => {
     const { user_id, user_name, first_name, last_name, user_email, user_password } = req.body;
     
@@ -140,7 +138,6 @@ app.post('/edituser', async (req, res) => {
     }
 
     try {
-        // ดึงข้อมูลปัจจุบันของ user
         const [currentUser] = await db.execute('SELECT * FROM user WHERE user_id = ?', [user_id]);
         
         if (currentUser.length === 0) {
@@ -149,13 +146,11 @@ app.post('/edituser', async (req, res) => {
 
         const user = currentUser[0];
         
-        // ใช้ค่าเดิมถ้าไม่มีการส่งมา
         const updatedUserName = user_name || user.user_name;
         const updatedFirstName = first_name || user.first_name;
         const updatedLastName = last_name || user.last_name;
         const updatedEmail = user_email || user.user_email;
         
-        // อัปเดตรหัสผ่านเฉพาะถ้ามีการส่งมา
         let updatedPassword = user.user_password;
         if (user_password && user_password.trim() !== '') {
             updatedPassword = await bcrypt.hash(user_password, SALT_ROUNDS);
@@ -175,15 +170,16 @@ app.post('/edituser', async (req, res) => {
     }
 });
 
-//7.API ดึงสถานที่
+// 7.  ดึงสถานที่ทั้งหมด
 app.get('/places', async (req, res) => {
     try {
         const sql = `
             SELECT 
                 p.place_id,
                 p.place_name,
+                p.place_province,
                 p.opening_hours,
-                p.place_score,
+                CAST(p.place_score AS DECIMAL(3,1)) as place_score,
                 pi.image_path
             FROM place p
             LEFT JOIN place_images pi ON p.place_id = pi.place_id
@@ -197,8 +193,7 @@ app.get('/places', async (req, res) => {
     }
 });
 
-//place detail 
-// ใน server.js - แก้ place detail API
+// 8. Place detail
 app.get('/places/:id', async (req, res) => {
     try {
         const { id } = req.params;
@@ -207,7 +202,6 @@ app.get('/places/:id', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid place ID' });
         }
         
-        // ⚠️ แก้: ใช้ CAST เพื่อแปลง numeric เป็น DECIMAL
         const sql = `
             SELECT
                 p.place_id,
@@ -234,7 +228,6 @@ app.get('/places/:id', async (req, res) => {
 
         const place = rows[0];
 
-        // ดึงรูปภาพแยก
         const imageSQL = `SELECT image_path FROM place_images WHERE place_id = ? ORDER BY image_id`;
         const [images] = await db.execute(imageSQL, [id]);
         
@@ -251,7 +244,7 @@ app.get('/places/:id', async (req, res) => {
     }
 });
 
-// กรอง categorybar
+// 9. กรอง categorybar
 const categoryMapping = {
     'cafes':      'Cafe & Restaurants',
     'temples':    'Temple',
@@ -272,7 +265,6 @@ app.get('/places/category/:type', async (req, res) => {
         const { type } = req.params; 
         const dbCategoryName = categoryMapping[type]; 
 
-   
         if (!dbCategoryName) {
             console.warn(`Invalid category requested: ${type}`);
             return res.status(404).json({ error: 'Category not found or invalid' });
@@ -281,14 +273,16 @@ app.get('/places/category/:type', async (req, res) => {
         const sql = `
             SELECT DISTINCT p.place_id,
                 p.place_name,
+                p.place_province,
                 p.opening_hours,
-                p.place_score,
+                CAST(p.place_score AS DECIMAL(3,1)) as place_score,
                 image_path 
             FROM place p
             LEFT JOIN place_images USING (place_id)
             JOIN place_category USING (place_id)
             JOIN category USING (category_id) 
             WHERE category_name = ?
+            ORDER BY CAST(p.place_score AS DECIMAL(3,1)) DESC, p.place_id
         `;
 
         const [rows] = await db.execute(sql, [dbCategoryName]);
@@ -301,8 +295,7 @@ app.get('/places/category/:type', async (req, res) => {
     }
 });
 
-//category
-// API กรองตาม category และ province
+// 10. category&province
 app.get('/categories', async (req, res) => {
     try {
         const { types, provinces } = req.query;
@@ -318,7 +311,7 @@ app.get('/categories', async (req, res) => {
                 p.place_province,
                 p.place_eng_province,
                 p.opening_hours,
-                p.place_score,
+                CAST(p.place_score AS DECIMAL(3,1)) as place_score,
                 (SELECT image_path FROM place_images WHERE place_id = p.place_id LIMIT 1) as image_path
             FROM place p
             LEFT JOIN place_category pc ON p.place_id = pc.place_id
@@ -339,7 +332,6 @@ app.get('/categories', async (req, res) => {
         if (provinces) {
             const provinceList = Array.isArray(provinces) ? provinces : [provinces];
             const placeholders = provinceList.map(() => '?').join(',');
-            // ใช้ place_eng_province แทน place_province
             sql += ` AND p.place_eng_province IN (${placeholders})`;
             params.push(...provinceList);
             console.log('Filtering by provinces:', provinceList);
@@ -366,14 +358,10 @@ app.get('/categories', async (req, res) => {
     }
 });
 
-//filter by opening days
-
-
-//get favorite
+// 11. Get favorite
 app.get('/favorites/:userId', async (req, res) => {
     try {
         const { userId } = req.params;
-        
         
         console.log('User ID:', userId);
         
@@ -383,7 +371,7 @@ app.get('/favorites/:userId', async (req, res) => {
                 p.place_name,
                 p.place_province,
                 p.opening_hours,
-                p.place_score,
+                CAST(p.place_score AS DECIMAL(3,1)) as place_score,
                 (SELECT image_path FROM place_images WHERE place_id = p.place_id LIMIT 1) as image_path,
                 f.favorite_id
             FROM favorite f
@@ -405,9 +393,7 @@ app.get('/favorites/:userId', async (req, res) => {
     }
 });
 
-
-
-// Check favorited
+// 12. Check favorited
 app.get('/favorites/:userId/:placeId', async (req, res) => {
     try {
         const { userId, placeId } = req.params;
@@ -427,7 +413,7 @@ app.get('/favorites/:userId/:placeId', async (req, res) => {
     }
 });
 
-// add favorite
+// 13. Add favorite
 app.post('/favorites', async (req, res) => {
     try {
         const { user_id, place_id } = req.body;
@@ -466,9 +452,8 @@ app.post('/favorites', async (req, res) => {
     }
 });
 
-
-//remove favorite
-   app.delete('/favorites/:userId/:placeId', async (req, res) => {
+// 14. Remove favorite
+app.delete('/favorites/:userId/:placeId', async (req, res) => {
     try {
         const { userId, placeId } = req.params;
         
@@ -496,6 +481,91 @@ app.post('/favorites', async (req, res) => {
 
 
 //rank
+app.get('/places/rank', async (req, res) => {    
+    try {
+        console.log('=== Rank API called ===');
+        
+        const sql = `
+            SELECT DISTINCT 
+                p.place_id,
+                p.place_name,
+                p.place_province,
+                p.opening_hours,
+                CAST(p.place_score AS DECIMAL(3,1)) as place_score,
+                image_path 
+            FROM place p
+            LEFT JOIN place_images USING (place_id)   
+            LEFT JOIN place_category USING (place_id)
+            LEFT JOIN category USING (category_id) 
+            ORDER BY CAST(p.place_score AS DECIMAL(3,1)) DESC, p.place_id
+        `;
+        const [rows] = await db.execute(sql);
+        
+        console.log('Rank query results:', rows.length, 'places');
+        if (rows.length > 0) {
+            console.log('First 5 places:', rows.slice(0, 5).map(r => ({
+                id: r.place_id,
+                name: r.place_name,
+                score: r.place_score
+            })));
+        }
+        
+        res.json(rows);
+    } catch (error) {
+        console.error('Error fetching rank:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Search - ค้นหาสถานที่ตามชื่อหรือจังหวัด
+app.get('/places/search', async (req, res) => {
+    try {
+        const { query } = req.query;
+        
+        console.log('=== Search API ===');
+        console.log('Search query:', query);
+        
+        if (!query || query.trim() === '') {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Search query is required' 
+            });
+        }
+        
+        const sql = `
+            SELECT DISTINCT 
+                p.place_id,
+                p.place_name,
+                p.place_province,
+                p.opening_hours,
+                CAST(p.place_score AS DECIMAL(3,1)) as place_score,
+                (SELECT image_path FROM place_images WHERE place_id = p.place_id LIMIT 1) as image_path
+            FROM place p
+            WHERE p.place_name LIKE ? OR p.place_province LIKE ?
+            ORDER BY CAST(p.place_score AS DECIMAL(3,1)) DESC, p.place_id
+        `;
+        
+        const searchTerm = `%${query}%`;
+        const [rows] = await db.execute(sql, [searchTerm, searchTerm]);
+        
+        console.log('Search results:', rows.length, 'places found');
+        if (rows.length > 0) {
+            console.log('Top 3 results:', rows.slice(0, 3).map(r => ({
+                name: r.place_name,
+                score: r.place_score
+            })));
+        }
+        
+        res.json({ success: true, data: rows, count: rows.length });
+        
+    } catch (error) {
+        console.error('Search error:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+//filter open hours
+
     
 
 
