@@ -1,26 +1,19 @@
-// terms.js
-document.addEventListener('DOMContentLoaded', () => {
-  const backBtn = document.getElementById('termsBackBtn');
+document.addEventListener("DOMContentLoaded", () => {
+  const backBtn = document.getElementById("termsBackBtn");
   if (!backBtn) return;
 
-  // อ่าน ?from=index / ?from=favorites / ?from=rank / ?from=about
-  const params = new URLSearchParams(window.location.search);
-  const from = params.get('from');
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
 
-  const fromMap = {
-    index: 'index.html',
-    favorites: 'favorites.html',
-    rank: 'rank.html',
-    about: 'about.html'
-  };
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get("from");
 
-  backBtn.addEventListener('click', () => {
-    if (from && fromMap[from]) {
-      window.location.href = fromMap[from];
-    } else if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.href = 'index.html';
+    if (from && window.navigation?.NAV?.[from]) {
+      window.navigation.go(from);
+      return;
     }
+
+    if (window.history.length > 1) window.history.back();
+    else window.navigation?.go("home");
   });
 });
