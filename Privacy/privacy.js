@@ -1,26 +1,19 @@
-// privacy.js
-document.addEventListener('DOMContentLoaded', () => {
-  const backBtn = document.getElementById('privacyBackBtn');
+document.addEventListener("DOMContentLoaded", () => {
+  const backBtn = document.getElementById("privacyBackBtn");
   if (!backBtn) return;
 
-  const params = new URLSearchParams(window.location.search);
-  const from = params.get('from'); // index / favorites / rank / about / terms ...
+  backBtn.addEventListener("click", (e) => {
+    e.preventDefault();
 
-  const fromMap = {
-    index: 'index.html',
-    favorites: 'favorites.html',
-    rank: 'rank.html',
-    about: 'about.html',
-    terms: 'terms.html'
-  };
+    const params = new URLSearchParams(window.location.search);
+    const from = params.get("from");
 
-  backBtn.addEventListener('click', () => {
-    if (from && fromMap[from]) {
-      window.location.href = fromMap[from];
-    } else if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      window.location.href = 'index.html';
+    if (from && window.navigation?.NAV?.[from]) {
+      window.navigation.go(from);
+      return;
     }
+
+    if (window.history.length > 1) window.history.back();
+    else window.navigation?.go("home");
   });
 });
