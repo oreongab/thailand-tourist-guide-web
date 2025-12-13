@@ -1,26 +1,29 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // ปุ่มหัวใจ (จะเห็นก็ต่อเมื่อมีข้อมูลและตัว content โผล่)
-  const favBtn = document.querySelector(".place-detail-fav");
-  if (favBtn) {
-    favBtn.addEventListener("click", () => {
-      favBtn.classList.toggle("is-active");
+document.addEventListener('DOMContentLoaded', function () {
+  var fav = document.querySelector('.place-detail-fav')
+  var back = document.querySelector('.place-detail-back')
 
-      const icon = favBtn.querySelector(".material-icons");
-      if (icon) {
-        icon.textContent = favBtn.classList.contains("is-active")
-          ? "favorite"
-          : "favorite_border";
+  if (fav) {
+    fav.addEventListener('click', function () {
+      if (fav.classList.contains('is-active')) {
+        fav.classList.remove('is-active')
+      } else {
+        fav.classList.add('is-active')
       }
-    });
+
+      var icon = fav.querySelector('.material-icons')
+      if (!icon) return
+
+      if (fav.classList.contains('is-active')) {
+        icon.textContent = 'favorite'
+      } else {
+        icon.textContent = 'favorite_border'
+      }
+    })
   }
 
-  // ปุ่มย้อนกลับ
-  const backBtn = document.querySelector(".place-detail-back");
-  if (backBtn) {
-    backBtn.addEventListener("click", () => {
-      window.history.back();
-      // หรือถ้าอยาก fix ให้กลับหน้า home:
-      // location.href = "../index/index.html";
-    });
+  if (back) {
+    back.addEventListener('click', function () {
+      history.back()
+    })
   }
-});
+})
