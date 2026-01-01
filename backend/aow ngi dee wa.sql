@@ -1,5 +1,6 @@
 create schema aowngaideewa;
 use aowngaideewa;
+
 create table user(
 user_id int not null primary key,
 user_name  varchar(35) not null,
@@ -7,6 +8,8 @@ first_name varchar(35) not null,
 last_name varchar(35) not null,
 user_email varchar(255) not null,
 user_password varchar(255) not null);
+ALTER TABLE user MODIFY user_id INT NOT NULL AUTO_INCREMENT;
+ALTER TABLE user AUTO_INCREMENT = 1;
 
 create table place(
 place_id int not null primary key,
@@ -17,13 +20,11 @@ starting_price numeric(5) default 0 null,
 opening_hours text null,
 place_event text null,
 place_score numeric(1,1) default 0 null);
-
 alter table place add place_eng_province varchar(50) not null;
 
 create table category(
 category_id int not null primary key,
 category_name varchar(25) not null);
-
 create table place_category(
 place_id int not null,
 category_id int not null,
@@ -37,141 +38,17 @@ user_id int not null,
 place_id int not null,
 foreign key (user_id) references user(user_id),
 foreign key (place_id) references place(place_id));
+alter table favorite modify favorite_id INT NOT NULL AUTO_INCREMENT;
+ALTER TABLE favorite AUTO_INCREMENT = 001;
 
 CREATE TABLE place_images (
     image_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     place_id INT NOT NULL,
-    image_path VARCHAR(500) NOT NULL,      
+    image_path VARCHAR(500) NOT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (place_id) REFERENCES place(place_id)
         ON DELETE CASCADE
 );
-INSERT INTO place_images (image_id, place_id, image_path) VALUES
-(1, 1001, 'project/img_place/images (1).jpg'),
-(2, 1002, 'project/img_place/watpho_front.jpg'),
-(3, 1003, 'project/img_place/e0b8a7e0b8b1e0b887-e1505234056426.jpg'),
-(4, 1004, 'project/img_place/2351f6d3c313f525c4089bc84d2410bf.jpg'),
-(5, 1005, 'project/img_place/shutterstock_549521977-825x550.jpg'),
-(6, 1006, 'project/img_place/iconsiam.jpg'),
-(7, 1007, 'project/img_place/apply-tourist-card-to.jpg'),
-(8, 1008, 'project/img_place/eb85ca00-df68-11ed-81c8-271696819d88_webp_original.jpg'),
-(9, 1009, 'project/img_place/5c11f790-08a9-11ed-b3fc-174b6eee67bf_webp_original.jpg'),
-(10, 1010, 'project/img_place/TheMO-BACC_cover.jpg'),
-(11, 1011, 'project/img_place/caf88b0a-6bd5-407f-b89d-09bd85b42211_0.jpg'),
-(12, 1012, 'project/img_place/อุทยานประวัติศาสตร์พระนครศรีอยุธยา_จังหวัดพระนครศรีอยุธยา.JPG.jpg'),
-(13, 1013, 'project/img_place/วัดมหาธาตุ-อยุธยา.jpg'),
-(14, 1014, 'project/img_place/IMG_20171002_093423-1024x768.jpg'),
-(15, 1015, 'project/img_place/55a03730-068e-11ee-b704-e11b1c7d3a39_webp_original.jpg'),
-(16, 1016, 'project/img_place/4e2ab2e0-44d7-11ea-ae38-73538266b6f9_original.jpg'),
-(17, 1017, 'project/img_place/4c569c00-db5f-7bb2-7a81-523fe306b1c2.jpg'),
-(18, 1018, 'project/img_place/348d9fc0-cc41-11ec-96f4-69b6cdc032b9_webp_original.jpg'),
-(19, 1019, 'project/img_place/4-3_1.jpg'),
-(20, 1020, 'project/img_place/the-main-entrance-to.jpg');
-
-
-ALTER TABLE user MODIFY user_id INT NOT NULL AUTO_INCREMENT;
-ALTER TABLE user AUTO_INCREMENT = 1;
-
-ALTER TABLE favorite ADD FOREIGN KEY (user_id) REFERENCES user(user_id);
-
-ALTER TABLE favorite DROP FOREIGN KEY favorite_ibfk_1;
-
-
-select*from user;
-select*from place;
-select*from place_images;
-select*from place_category;
-select*from category;
-select*from favorite;
-
-update place set place_score = 3.1 where place_id = 1011;
-
-SELECT DISTINCT  p.place_id, p.place_name, p.opening_hours, p.place_score, image_path from place p
-left join place_images using ( place_id )
-join  place_category using ( place_id )
-join category using (category_id) where category_name = "Temple" 
-order by  p.place_id ;
-
-alter table favorite modify favorite_id INT NOT NULL AUTO_INCREMENT;
-ALTER TABLE favorite AUTO_INCREMENT = 001;
-
-SELECT DISTINCT  p.place_id, p.place_name, p.opening_hours, p.place_score, image_path from place p
-left join place_images using ( place_id )
-join  place_category using ( place_id )
-join category using (category_id) 
-order by p.place_score desc;
-
-UPDATE place_images
-SET image_path = 'project/img_place/images (1).jpg'
-WHERE image_id = 1;
-
-SELECT  p.place_id, p.place_name, p.place_province, p.opening_hours,  place_score, pi.image_path FROM place p
-LEFT JOIN place_images pi ON p.place_id = pi.place_id;
-            
-SELECT p.place_id, p.place_name, p.place_province, p.place_address, p.opening_hours,p.place_score,p.starting_price, p.place_event, 
-GROUP_CONCAT(DISTINCT c.category_name SEPARATOR ', ') as categories FROM place p
-LEFT JOIN place_category pc ON p.place_id = pc.place_id
-LEFT JOIN category c ON pc.category_id = c.category_id group by place_id;
-
-update place set opening_hours = "อาทิตย์-เสาร์  07:00-18:00" where place_id = 1004;
-
-SELECT DISTINCT p.place_id, p.place_name, p.place_province, p.opening_hours, p.place_score, pi.image_path  FROM place p
-LEFT JOIN place_images pi USING (place_id) ORDER BY place_score DESC, p.place_id;
-
-SELECT  p.place_id, p.place_name, p.place_province, p.opening_hours, p.place_score,
-(SELECT image_path FROM place_images WHERE place_id = p.place_id LIMIT 1) as image_path
-FROM place p WHERE p.place_province LIKE "%เชียงใหม่%" ;
-
- SELECT DISTINCT p.place_id, p.place_name, p.place_province, p.place_eng_province, p.opening_hours,p.place_score,
- (SELECT image_path FROM place_images WHERE place_id = p.place_id LIMIT 1) as image_path FROM place p
- LEFT JOIN place_category pc USING (place_id)
- LEFT JOIN category c USING (category_id) WHERE 1=1;
- 
-  SELECT DISTINCT p.place_id, p.place_name, p.place_province, p.place_eng_province, p.opening_hours, p.place_score, f.favorite_id FROM favorite f
-  JOIN place p USING (place_id) WHERE f.user_id = 3 ORDER BY f.favorite_id ;
-  
-
-
-CREATE TABLE Place (
-    place_id INT PRIMARY KEY,
-    place_name VARCHAR(255) NOT NULL,
-    place_address VARCHAR(255) NOT NULL,
-    place_province VARCHAR(100) NOT NULL,
-    starting_price NUMERIC(5) DEFAULT 0,
-    opening_hours TEXT,
-    place_event TEXT,
-    place_score NUMERIC(2,1) DEFAULT 0
-);
-
-CREATE TABLE Category (
-    catagory_id INT PRIMARY KEY,
-    catagory_name VARCHAR(100) NOT NULL
-);
-
-CREATE TABLE Place_Category (
-    place_id INT NOT NULL,
-    catagory_id INT NOT NULL,
-    PRIMARY KEY (place_id, catagory_id)
-);
-
-INSERT INTO category (category_id , category_name) VALUES
-  (2001, 'Art'),
-  (2002, 'Beaches'),
-  (2003, 'Cafe & Restaurants'),
-  (2004, 'History'),
-  (2005, 'Markets'),
-  (2006, 'Museums'),
-  (2007, 'Mall'),
-  (2008, 'Natural'),
-  (2009, 'Parks & Garden'),
-  (2010, 'Temple'),
-  (2011, 'Sports'),
-  (2012, 'Other');
-  
-  
-  ALTER TABLE place
-MODIFY place_score DECIMAL(2,1);
-
 
 INSERT INTO place (place_id, place_name, place_address, place_province, starting_price, opening_hours, place_event, place_score) VALUES
   (1001, 'วัดอรุณราชวราราม', 'ถนนอรุณอมรินทร์ แขวงวัดอรุณ เขตบางกอกใหญ่ กรุงเทพมหานคร', 'กรุงเทพมหานคร', 0, 'อาทิตย์-ศุกร์ 07:00-18:00', 'วัดเก่าแก่ริมแม่น้ำเจ้าพระยา เป็นสัญลักษณ์ของกรุงเทพฯ', 4.3),
@@ -275,8 +152,8 @@ INSERT INTO place (place_id, place_name, place_address, place_province, starting
   (1099, 'สวนสยาม (สยามอะเมซิ่งพาร์ค)', 'เขตคันนายาว กรุงเทพมหานคร', 'กรุงเทพมหานคร', 0, 'อาทิตย์-ศุกร์ 10:00-18:00', 'สวนสนุกและสวนน้ำขนาดใหญ่ของกรุงเทพฯ', 4.5),
   (1100, 'สวนเบญจกิติ', 'เขตคลองเตย กรุงเทพมหานคร', 'กรุงเทพมหานคร', 0, 'อาทิตย์-ศุกร์ 05:00-21:00', 'สวนสาธารณะล้อมทะเลสาบ มีเลนจักรยานและทางเดิน', 4.6);
 
-select*from place;
 
+ 
 INSERT INTO place_category (place_id, category_id) VALUES
   (1001, 2010),
   (1001, 2004),
@@ -498,10 +375,6 @@ INSERT INTO place_category (place_id, category_id) VALUES
   (1099, 2009),
   (1100, 2009),
   (1100, 2008);
-  
-  select * from place_category;
-
-UPDATE place
 SET place_eng_province = CASE place_province
     WHEN 'กรุงเทพมหานคร' THEN 'Bangkok'
     WHEN 'พระนครศรีอยุธยา' THEN 'Phra Nakhon Si Ayutthaya'
@@ -538,3 +411,45 @@ SET place_eng_province = CASE place_province
     ELSE NULL
 END
 WHERE place_id BETWEEN 1001 AND 1100;
+INSERT INTO place_images (image_id, place_id, image_path) VALUES
+(1, 1001, 'project/img_place/images (1).jpg'),
+(2, 1002, 'project/img_place/watpho_front.jpg'),
+(3, 1003, 'project/img_place/e0b8a7e0b8b1e0b887-e1505234056426.jpg'),
+(4, 1004, 'project/img_place/2351f6d3c313f525c4089bc84d2410bf.jpg'),
+(5, 1005, 'project/img_place/shutterstock_549521977-825x550.jpg'),
+(6, 1006, 'project/img_place/iconsiam.jpg'),
+(7, 1007, 'project/img_place/apply-tourist-card-to.jpg'),
+(8, 1008, 'project/img_place/eb85ca00-df68-11ed-81c8-271696819d88_webp_original.jpg'),
+(9, 1009, 'project/img_place/5c11f790-08a9-11ed-b3fc-174b6eee67bf_webp_original.jpg'),
+(10, 1010, 'project/img_place/TheMO-BACC_cover.jpg'),
+(11, 1011, 'project/img_place/caf88b0a-6bd5-407f-b89d-09bd85b42211_0.jpg'),
+(12, 1012, 'project/imgplace/อุทยานประวัติศาสตร์พระนครศรีอยุธยาจังหวัดพระนครศรีอยุธยา.JPG.jpg'),
+(13, 1013, 'project/img_place/วัดมหาธาตุ-อยุธยา.jpg'),
+(14, 1014, 'project/img_place/IMG_20171002_093423-1024x768.jpg'),
+(15, 1015, 'project/img_place/55a03730-068e-11ee-b704-e11b1c7d3a39_webp_original.jpg'),
+(16, 1016, 'project/img_place/4e2ab2e0-44d7-11ea-ae38-73538266b6f9_original.jpg'),
+(17, 1017, 'project/img_place/4c569c00-db5f-7bb2-7a81-523fe306b1c2.jpg'),
+(18, 1018, 'project/img_place/348d9fc0-cc41-11ec-96f4-69b6cdc032b9_webp_original.jpg'),
+(19, 1019, 'project/img_place/4-3_1.jpg'),
+(20, 1020, 'project/img_place/the-main-entrance-to.jpg');
+
+ALTER TABLE place
+MODIFY place_score DECIMAL(2,1);
+INSERT INTO category (category_id , category_name) VALUES
+  (2001, 'Art'),
+  (2002, 'Beaches'),
+  (2003, 'Cafe & Restaurants'),
+  (2004, 'History'),
+  (2005, 'Markets'),
+  (2006, 'Museums'),
+  (2007, 'Mall'),
+  (2008, 'Natural'),
+  (2009, 'Parks & Garden'),
+  (2010, 'Temple'),
+  (2011, 'Sports'),
+  (2012, 'Other');
+
+ALTER TABLE user MODIFY user_id INT NOT NULL AUTO_INCREMENT;
+ALTER TABLE user AUTO_INCREMENT = 1;
+alter table favorite modify favorite_id INT NOT NULL AUTO_INCREMENT;
+ALTER TABLE favorite AUTO_INCREMENT = 001;
